@@ -1,11 +1,11 @@
-# Digital-Sippoy — DS-A1
+# Digital-Sippoy — DS-A2
 
 **Architecture note:** Full-stack (single Next.js app serving both the API route and the UI).
 
 | | |
 |---|---|
-| Bundler | Turbopack (`next dev --turbo` / `next build --turbo`) |
-| Package manager | npm |
+| Bundler | Webpack (default — no `--turbo` flag) |
+| Package manager | yarn (Berry) |
 | Router | App Router |
 | Node.js | 20.x |
 | React | 19.1.0 |
@@ -13,21 +13,26 @@
 
 ## Fixture
 
-- `GET /api/items`, `POST /api/items` — `app/api/items/route.ts`
-- List page — `app/page.tsx` (Server Component)
-- Create form — `app/items-form.tsx` (Client Component)
-- Store — `lib/db.ts` reading/writing `data/items.json`
+Identical to DS-A1: `app/api/items/route.ts`, `app/page.tsx`, `app/items-form.tsx`, `lib/db.ts` + `data/items.json`.
 
 ## Run it
 
 ```bash
-npm install
-npm run build     # next build --turbo
-npm start         # or: npm run dev  (next dev --turbo)
+corepack enable            # or: npm i -g yarn (any Yarn 4.x works)
+yarn install                # nodeLinker: node-modules (see .yarnrc.yml)
+yarn build                  # next build (webpack)
+yarn start                  # or: yarn dev
 ```
+
+## Package-manager notes
+
+Yarn Berry defaults to Plug'n'Play (PnP), which Next.js does not support out of the box.
+`.yarnrc.yml` pins `nodeLinker: node-modules` so `node_modules` is laid out the classic way and
+Next.js resolves normally. With that one setting, install and build both work with no other
+changes to the DS-A1 fixture.
 
 ## Build status
 
-Built and verified locally with npm 10.8.2 on a portable Node.js 20.19.0 runtime.
-`npm install` and `npm run build` (Turbopack) both completed successfully.
+Built and verified locally with Yarn 4.18.0 (via Corepack) on a portable Node.js 20.19.0 runtime.
+`yarn install` and `yarn build` (Webpack) both completed successfully — no incompatibilities found.
 See the root `README.md` for the full 6-branch matrix.
