@@ -1,15 +1,15 @@
 {
-  "name": "digital-sippoy-ds-a1",
+  "name": "digital-sippoy-ds-a4",
   "version": "1.0.0",
   "private": true,
-  "description": "Digital-Sippoy DS-A1: Next.js 15.5.12 / React 19.1.0 App Router, Turbopack, npm. Full-stack architecture note.",
+  "description": "Digital-Sippoy DS-A4: Next.js 15.5.12 / React 19.1.0 App Router, Webpack (default), bun. Event-driven architecture note (this app represents one participant in a larger event-driven system).",
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "npm@10.8.2",
+  "packageManager": "bun@1.3.14",
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build --turbo",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
