@@ -1,10 +1,11 @@
-# Digital-Sippoy — DS-A1
+# Digital-Sippoy — DS-A6
 
-**Architecture note:** Full-stack (single Next.js app serving both the API route and the UI).
+**Architecture note:** Event-driven (variant) — this app represents one participant in a larger
+event-driven system; the app itself is intentionally kept simple.
 
 | | |
 |---|---|
-| Bundler | Turbopack (`next dev --turbo` / `next build --turbo`) |
+| Bundler | Webpack (default — no `--turbo` flag) |
 | Package manager | npm |
 | Router | App Router |
 | Node.js | 20.x |
@@ -13,21 +14,18 @@
 
 ## Fixture
 
-- `GET /api/items`, `POST /api/items` — `app/api/items/route.ts`
-- List page — `app/page.tsx` (Server Component)
-- Create form — `app/items-form.tsx` (Client Component)
-- Store — `lib/db.ts` reading/writing `data/items.json`
+Identical to DS-A1: `app/api/items/route.ts`, `app/page.tsx`, `app/items-form.tsx`, `lib/db.ts` + `data/items.json`.
 
 ## Run it
 
 ```bash
 npm install
-npm run build     # next build --turbo
-npm start         # or: npm run dev  (next dev --turbo)
+npm run build     # next build (webpack)
+npm start          # or: npm run dev
 ```
 
 ## Build status
 
 Built and verified locally with npm 10.8.2 on a portable Node.js 20.19.0 runtime.
-`npm install` and `npm run build` (Turbopack) both completed successfully.
+`npm install` and `npm run build` (Webpack) both completed successfully — no incompatibilities found.
 See the root `README.md` for the full 6-branch matrix.
