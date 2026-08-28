@@ -25,14 +25,18 @@ async function assertPostRejects(body: unknown, expectedError: RegExp): Promise<
   assert.match(responseBody.error, expectedError);
 }
 
+async function assertUnauthorized(res: Response): Promise<void> {
+  assert.equal(res.status, 401);
+  const body = (await res.json()) as { error: string };
+  assert.equal(body.error, "Authentication required");
+}
+
 describe("items API route (App Router)", () => {
   const service = useFakeItemsService(SEED);
 
   it("GET without a session returns 401 with an explanatory message", async () => {
     const res = await GET(anonymousRequest(ITEMS_URL));
-    assert.equal(res.status, 401);
-    const body = (await res.json()) as { error: string };
-    assert.equal(body.error, "Authentication required");
+    await assertUnauthorized(res);
   });
 
   it("POST without a session returns 401 and never reaches items-service", async () => {
@@ -43,9 +47,7 @@ describe("items API route (App Router)", () => {
         body: JSON.stringify({ name: "Should not be created" }),
       })
     );
-    assert.equal(res.status, 401);
-    const body = (await res.json()) as { error: string };
-    assert.equal(body.error, "Authentication required");
+    await assertUnauthorized(res);
 
     const afterRes = await GET(await authenticatedRequest(ITEMS_URL));
     const afterBody = (await afterRes.json()) as { items: unknown[] };

@@ -128,17 +128,19 @@ export function useFakeItemsService(seed: FakeItem[]) {
 }
 
 /**
- * Points ITEMS_SERVICE_URL at a minimal, deliberately-broken HTTP server
- * for the duration of `run`, then restores it. Extracted because the two
- * "items-service returns a bad response" tests in test/lib/db.test.ts
- * were otherwise near-identical (also jscpd-flagged).
+ * Points ITEMS_SERVICE_URL at a minimal, custom HTTP server for the
+ * duration of `run`, then restores it. Takes `req` as well as `res` so
+ * it covers both "items-service returns a bad response" tests (which
+ * only need `res`) and "assert on what we sent" tests (which need
+ * `req`) -- the two shapes were near-identical without this (also
+ * jscpd-flagged).
  */
 export async function withBrokenServer(
-  respond: (res: http.ServerResponse) => void,
+  respond: (res: http.ServerResponse, req: http.IncomingMessage) => void,
   restoreUrl: string,
   run: () => Promise<void>
 ): Promise<void> {
-  const server = http.createServer((_req, res) => respond(res));
+  const server = http.createServer((req, res) => respond(res, req));
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const { port } = server.address() as AddressInfo;
   process.env.ITEMS_SERVICE_URL = `http://127.0.0.1:${port}`;

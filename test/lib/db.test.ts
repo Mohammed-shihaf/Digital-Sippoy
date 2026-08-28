@@ -1,6 +1,4 @@
 import assert from "node:assert/strict";
-import http from "node:http";
-import type { AddressInfo } from "node:net";
 import { getItems, addItem } from "../../lib/db";
 import {
   useFakeItemsService,
@@ -39,21 +37,18 @@ describe("lib/db.ts (items-service HTTP client)", () => {
 
   it("addItem() sends the body as application/json", async () => {
     let receivedContentType: string | undefined;
-    const server = http.createServer((req, res) => {
-      receivedContentType = req.headers["content-type"];
-      res.writeHead(201, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ item: { id: "x", name: "Chair", createdAt: "now" } }));
-    });
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as AddressInfo;
-    process.env.ITEMS_SERVICE_URL = `http://127.0.0.1:${port}`;
-    try {
-      await addItem("Chair");
-      assert.equal(receivedContentType, "application/json");
-    } finally {
-      process.env.ITEMS_SERVICE_URL = service.url;
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-    }
+    await withBrokenServer(
+      (res, req) => {
+        receivedContentType = req.headers["content-type"];
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ item: { id: "x", name: "Chair", createdAt: "now" } }));
+      },
+      service.url,
+      async () => {
+        await addItem("Chair");
+        assert.equal(receivedContentType, "application/json");
+      }
+    );
   });
 
   it("getItems() throws when items-service is unreachable", async () => {
