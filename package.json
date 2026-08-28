@@ -2,7 +2,7 @@
   "name": "digital-sippoy-ds-002",
   "version": "1.0.0",
   "private": true,
-  "description": "Digital-Sippoy DS-002: Next.js 15.5.12 / React 19.1.0 App Router, Turbopack, npm. Microservices architecture note.",
+  "description": "Digital-Sippoy DS-002: Next.js 15.5.24 / React 19.1.0 App Router, Turbopack, npm. Microservices architecture note.",
   "engines": {
     "node": "20.x"
   },
@@ -20,7 +20,7 @@
     "mutation": "stryker run"
   },
   "dependencies": {
-    "next": "15.5.12",
+    "next": "15.5.24",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -36,7 +36,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.12",
+    "eslint-config-next": "15.5.24",
     "eslint-plugin-security": "^3.0.1",
     "jscpd": "^4.0.5",
     "mocha": "^10.7.3",

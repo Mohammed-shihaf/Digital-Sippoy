@@ -23,7 +23,7 @@ decision before it can be closed).
 | V1 — Architecture, Threat Modeling | Accepted gap | No formal threat model exists for a fixture this small; the attack surface is one API route over a JSON file, documented in the README instead of a separate model. |
 | V4 — Access Control | Met | `GET`/`POST /api/items` require a valid session (`lib/require-session.ts`, checked via `next-auth/jwt`'s `getToken()`); unauthenticated requests get 401 and the store is never touched. Verified with real signed JWTs in tests and a live end-to-end smoke test (login → cookie → 200; no cookie → 401; wrong password → rejected). |
 | V3 — Session Management | Met | NextAuth.js, JWT strategy, `httpOnly` session cookie. Single demo user (Credentials provider) — a real user store/sign-up flow is out of scope for a minimal CRUD fixture; see README.md's Auth section for how to override the demo credentials and secret. |
-| Known-vulnerable dependencies | **Open** | `npm audit` currently reports 3 real high-severity advisories against the pinned `next@15.5.12` and its transitive `postcss`/`sharp`. The fix (`next@15.5.24`) changes the locked technology baseline shared by all 71 branches in this repo, so it's tracked here as an open decision rather than patched silently. CI's `audit` job (`.github/workflows/ci.yml`) reports this on every run without blocking merges until that decision is made. |
+| Known-vulnerable dependencies | Partially met, one item still **Open** | Bumped `next@15.5.12` → `15.5.24` repo-wide per the repo owner's decision, fixing the 3 direct Next.js advisories (SSRF via rewrites, image-optimization DoS, internal Server Function disclosure). `npm audit` now reports 3 *different*, smaller findings (1 moderate, 2 high) against transitive `postcss`/`sharp` that `next@15.5.24` still pulls in — full resolution needs **Next.js 16**, a major version jump well beyond the approved patch bump, so that's a separate open decision, not folded into this one silently. |
 
 ## Deliberately accepted, not tracked as gaps
 
@@ -45,6 +45,6 @@ bug on purpose:
 
 - CI (`.github/workflows/ci.yml`, `codeql.yml`, `semgrep.yml`) supplies
   the automated half of V5/V7/V10/V14 verification on every push.
-- The one remaining **Open** row (the `next@15.5.12` CVEs) is being closed
-  as a separate, repo-wide version bump rather than folded into this
-  branch's diff silently.
+- The remaining **Open** item — `postcss`/`sharp`'s transitive CVEs,
+  which need Next.js 16 — is intentionally left for a future decision
+  rather than a silent major-version jump.

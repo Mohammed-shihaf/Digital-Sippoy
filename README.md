@@ -9,7 +9,7 @@
 | Router | App Router |
 | Node.js | 20.x |
 | React | 19.1.0 |
-| Next.js | 15.5.12 |
+| Next.js | 15.5.24 |
 
 ## Fixture
 
