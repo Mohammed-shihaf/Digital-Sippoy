@@ -2,13 +2,8 @@
   "extends": "@istanbuljs/nyc-config-typescript",
   "reporter": ["text", "json-summary", "html"],
   "report-dir": "nyc-mocha",
-  "include": ["lib/**/*.ts", "app/api/**/*.ts"],
-  "exclude": [
-    "lib/lint-fixtures.ts",
-    "test/**/*.ts",
-    "**/*.d.ts",
-    "app/api/auth/**"
-  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/db-clone.ts", "src/index.ts", "test/**/*.ts", "**/*.d.ts"],
   "all": true,
   "check-coverage": false
 }

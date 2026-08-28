@@ -1,106 +1,87 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
+import http from "node:http";
+import type { AddressInfo } from "node:net";
 import { getItems, addItem } from "../../lib/db";
+import {
+  useFakeItemsService,
+  withBrokenServer,
+  type FakeItem,
+} from "../helpers/fake-items-service";
 
-const DATA_FILE = path.join(process.cwd(), "data", "items.json");
+const SEED: FakeItem[] = [
+  { id: "1", name: "Older", createdAt: "2024-01-01T00:00:00.000Z" },
+  { id: "2", name: "Newer", createdAt: "2024-06-01T00:00:00.000Z" },
+];
 
-async function restoreDataFile(original: string | null): Promise<void> {
-  if (original !== null) {
-    await fs.writeFile(DATA_FILE, original, "utf-8");
-  } else {
-    await fs.rm(DATA_FILE, { force: true });
-  }
-}
+describe("lib/db.ts (items-service HTTP client)", () => {
+  const service = useFakeItemsService(SEED);
 
-describe("lib/db.ts", () => {
-  let originalData: string | null;
-
-  before(async () => {
-    originalData = await fs.readFile(DATA_FILE, "utf-8").catch(() => null);
-  });
-
-  afterEach(async () => {
-    await restoreDataFile(originalData);
-  });
-
-  it("reads existing items as an array", async () => {
+  it("getItems() returns items-service's items, newest-first", async () => {
     const items = await getItems();
-    assert.ok(Array.isArray(items));
+    assert.deepEqual(
+      items.map((i) => i.id),
+      ["2", "1"]
+    );
   });
 
-  it("adds a new item and persists it", async () => {
-    const item = await addItem("Test Item");
+  it("addItem() posts the name and returns the created item", async () => {
+    const item = await addItem("Chair");
+    assert.equal(item.name, "Chair");
     assert.ok(item.id);
-    assert.equal(item.name, "Test Item");
 
     const items = await getItems();
     assert.ok(items.some((i) => i.id === item.id));
   });
 
-  it("trims surrounding whitespace off the stored name", async () => {
-    const item = await addItem("  Chair  ");
-    assert.equal(item.name, "Chair");
-  });
-
-  it("rejects an empty name with the expected message", async () => {
+  it("addItem() throws with items-service's validation error message", async () => {
     await assert.rejects(() => addItem(""), /non-empty string/);
   });
 
-  it("rejects a whitespace-only name with the expected message", async () => {
-    await assert.rejects(() => addItem("   "), /non-empty string/);
+  it("addItem() sends the body as application/json", async () => {
+    let receivedContentType: string | undefined;
+    const server = http.createServer((req, res) => {
+      receivedContentType = req.headers["content-type"];
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ item: { id: "x", name: "Chair", createdAt: "now" } }));
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const { port } = server.address() as AddressInfo;
+    process.env.ITEMS_SERVICE_URL = `http://127.0.0.1:${port}`;
+    try {
+      await addItem("Chair");
+      assert.equal(receivedContentType, "application/json");
+    } finally {
+      process.env.ITEMS_SERVICE_URL = service.url;
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 
-  it("sorts items newest-first by createdAt, not insertion order", async () => {
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(
-      DATA_FILE,
-      JSON.stringify([
-        { id: "a", name: "Older", createdAt: "2024-01-01T00:00:00.000Z" },
-        { id: "b", name: "Newer", createdAt: "2024-06-01T00:00:00.000Z" },
-      ]),
-      "utf-8"
-    );
-    const items = await getItems();
-    assert.deepEqual(
-      items.map((i) => i.id),
-      ["b", "a"]
-    );
-  });
-
-  it("leaves an already-sorted file unchanged (comparator isn't a blind reversal)", async () => {
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(
-      DATA_FILE,
-      JSON.stringify([
-        { id: "b", name: "Newer", createdAt: "2024-06-01T00:00:00.000Z" },
-        { id: "a", name: "Older", createdAt: "2024-01-01T00:00:00.000Z" },
-      ]),
-      "utf-8"
-    );
-    const items = await getItems();
-    assert.deepEqual(
-      items.map((i) => i.id),
-      ["b", "a"]
-    );
-  });
-
-  it("returns an empty array when the data file is missing (ENOENT)", async () => {
-    await fs.rm(DATA_FILE, { force: true });
-    const items = await getItems();
-    assert.deepEqual(items, []);
-  });
-
-  it("re-throws non-ENOENT read errors instead of swallowing them", async () => {
-    // Replace the data file with a directory of the same name: reading it
-    // fails with EISDIR, not ENOENT, so getItems() must propagate the error
-    // rather than treating it like a missing file.
-    await fs.rm(DATA_FILE, { force: true, recursive: true });
-    await fs.mkdir(DATA_FILE, { recursive: true });
+  it("getItems() throws when items-service is unreachable", async () => {
+    process.env.ITEMS_SERVICE_URL = "http://127.0.0.1:47999";
     try {
       await assert.rejects(() => getItems());
     } finally {
-      await fs.rm(DATA_FILE, { force: true, recursive: true });
+      process.env.ITEMS_SERVICE_URL = service.url;
     }
+  });
+
+  it("addItem() throws when items-service's response body isn't valid JSON", async () => {
+    await withBrokenServer(
+      (res) => res.writeHead(201, { "Content-Type": "application/json" }).end("not-json"),
+      service.url,
+      async () => {
+        await assert.rejects(() => addItem("Chair"), /returned 201/);
+      }
+    );
+  });
+
+  it("getItems() throws when items-service responds with an error status", async () => {
+    await withBrokenServer(
+      (res) => res.writeHead(500).end(),
+      service.url,
+      async () => {
+        await assert.rejects(() => getItems(), /returned 500/);
+      }
+    );
   });
 });

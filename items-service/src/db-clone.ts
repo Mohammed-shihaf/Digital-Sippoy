@@ -1,12 +1,11 @@
 /**
  * Deliberate duplication fixture for jscpd (Code Duplication metrics).
  *
- * This is a copy-pasted twin of lib/db.ts's pre-refactor addItem/readAll/
- * writeAll implementation. It is never imported by any app code — its only
- * purpose is to give the duplication scanner a real clone pair to find and
- * report on (Defect Propagation Risk, Refactoring Identification,
- * Structural Cleanliness Score), since the actual application code is
- * intentionally kept clone-free. See jscpd.json for scan config.
+ * Moved here from the web gateway's lib/db-clone.ts when the
+ * microservices split happened: items-service is now the component that
+ * actually owns file I/O, so this is the natural home for the clone-pair
+ * fixture jscpd is meant to detect. Never imported by any real code --
+ * see jscpd.json for scan config.
  */
 import fs from "node:fs/promises";
 import path from "node:path";

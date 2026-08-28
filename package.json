@@ -13,7 +13,7 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json",
-    "dup": "jscpd .",
+    "dup": "jscpd . --config jscpd.json",
     "test": "mocha",
     "test:coverage": "nyc npm test",
     "test:coverage:gate": "nyc --check-coverage --statements 95 --functions 95 --lines 95 --branches 85 npm test",
