@@ -36,5 +36,6 @@ lint-report.json
 jscpd-report/
 coverage/
 .nyc_output/
+nyc-mocha/
 mutation-report.json
 reports/mutation/
