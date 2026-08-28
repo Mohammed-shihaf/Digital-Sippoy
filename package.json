@@ -16,6 +16,7 @@
     "dup": "jscpd .",
     "test": "mocha",
     "test:coverage": "nyc npm test",
+    "test:coverage:gate": "nyc --check-coverage --statements 95 --functions 95 --lines 95 --branches 85 npm test",
     "mutation": "stryker run"
   },
   "dependencies": {
