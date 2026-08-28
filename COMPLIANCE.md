@@ -21,8 +21,8 @@ decision before it can be closed).
 | V10 — Malicious/Dead Code | Met | `lib/db-clone.ts` is the one intentional exception — a clearly-labeled, unimported duplication-scanner fixture (Phase 2), not reachable app code. |
 | V14 — Configuration | Met | `.gitignore` keeps every generated report (lint, coverage, mutation, duplication) out of the repo; dependency versions are pinned in `package.json` + lockfile. |
 | V1 — Architecture, Threat Modeling | Accepted gap | No formal threat model exists for a fixture this small; the attack surface is one API route over a JSON file, documented in the README instead of a separate model. |
-| V4 — Access Control | **Open** | No authentication or authorization exists on `GET`/`POST /api/items` — see the remediation plan's flagged decision. This fixture is intentionally an open CRUD demo today; closing this requires an explicit choice (accept as-is / add an optional guard / implement real auth), not a silent code change. |
-| V3 — Session Management | N/A | No sessions exist because there is no authentication (see V4). Revisit together if V4 changes. |
+| V4 — Access Control | Met | `GET`/`POST /api/items` require a valid session (`lib/require-session.ts`, checked via `next-auth/jwt`'s `getToken()`); unauthenticated requests get 401 and the store is never touched. Verified with real signed JWTs in tests and a live end-to-end smoke test (login → cookie → 200; no cookie → 401; wrong password → rejected). |
+| V3 — Session Management | Met | NextAuth.js, JWT strategy, `httpOnly` session cookie. Single demo user (Credentials provider) — a real user store/sign-up flow is out of scope for a minimal CRUD fixture; see README.md's Auth section for how to override the demo credentials and secret. |
 | Known-vulnerable dependencies | **Open** | `npm audit` currently reports 3 real high-severity advisories against the pinned `next@15.5.12` and its transitive `postcss`/`sharp`. The fix (`next@15.5.24`) changes the locked technology baseline shared by all 71 branches in this repo, so it's tracked here as an open decision rather than patched silently. CI's `audit` job (`.github/workflows/ci.yml`) reports this on every run without blocking merges until that decision is made. |
 
 ## Deliberately accepted, not tracked as gaps
@@ -45,6 +45,6 @@ bug on purpose:
 
 - CI (`.github/workflows/ci.yml`, `codeql.yml`, `semgrep.yml`) supplies
   the automated half of V5/V7/V10/V14 verification on every push.
-- The two **Open** rows above are the only unresolved items; they're
-  intentionally left for the repo owner to decide rather than closed by
-  an automated change.
+- The one remaining **Open** row (the `next@15.5.12` CVEs) is being closed
+  as a separate, repo-wide version bump rather than folded into this
+  branch's diff silently.

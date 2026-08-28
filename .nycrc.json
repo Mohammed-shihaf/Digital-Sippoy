@@ -3,7 +3,12 @@
   "reporter": ["text", "json-summary", "html"],
   "report-dir": "nyc-mocha",
   "include": ["lib/**/*.ts", "app/api/**/*.ts"],
-  "exclude": ["lib/db-clone.ts", "test/**/*.ts", "**/*.d.ts"],
+  "exclude": [
+    "lib/db-clone.ts",
+    "test/**/*.ts",
+    "**/*.d.ts",
+    "app/api/auth/**"
+  ],
   "all": true,
   "check-coverage": false
 }

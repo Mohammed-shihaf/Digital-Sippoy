@@ -1,13 +1,24 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { addItem, getItems } from "@/lib/db";
 import { assertItemName } from "@/lib/validate";
+import { unauthorizedResponse } from "@/lib/require-session";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const unauthorized = await unauthorizedResponse(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   const items = await getItems();
   return NextResponse.json({ items });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const unauthorized = await unauthorizedResponse(request);
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   let body: unknown;
   try {
     body = await request.json();
