@@ -33,7 +33,7 @@ next-env.d.ts
 
 # Lint / quality tool reports (CI artifacts, never committed)
 lint-report.json
-jscpd-report.json
+jscpd-report/
 coverage/
 .nyc_output/
 mutation-report.json

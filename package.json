@@ -12,7 +12,8 @@
     "build": "next build --turbo",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
-    "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json"
+    "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json",
+    "dup": "jscpd ."
   },
   "dependencies": {
     "next": "15.5.12",
@@ -27,6 +28,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.12",
     "eslint-plugin-security": "^3.0.1",
+    "jscpd": "^4.0.5",
     "typescript": "^5.6.0"
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { addItem, getItems } from "@/lib/db";
+import { assertItemName } from "@/lib/validate";
 
 export async function GET() {
   const items = await getItems();
@@ -14,10 +15,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const name = (body as { name?: unknown })?.name;
-  if (typeof name !== "string" || name.trim().length === 0) {
+  let name: string;
+  try {
+    name = assertItemName((body as { name?: unknown })?.name);
+  } catch (err) {
     return NextResponse.json(
-      { error: "`name` is required and must be a non-empty string" },
+      { error: err instanceof Error ? err.message : "Invalid `name`" },
       { status: 400 }
     );
   }
