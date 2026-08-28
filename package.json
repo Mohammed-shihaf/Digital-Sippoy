@@ -11,7 +11,8 @@
     "dev": "next dev --turbo",
     "build": "next build --turbo",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json"
   },
   "dependencies": {
     "next": "15.5.12",
@@ -19,9 +20,13 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
     "@types/node": "^20.14.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.12",
+    "eslint-plugin-security": "^3.0.1",
     "typescript": "^5.6.0"
   }
 }
