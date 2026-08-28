@@ -62,17 +62,28 @@ See [COMPLIANCE.md](COMPLIANCE.md) for the full security/compliance mapping.
 
 - **Lint** — `npm run lint` (ESLint flat config, `eslint-plugin-security`, a project rule barring
   filesystem access outside `lib/db.ts`). `lib/lint-fixtures.ts` is a deliberate, labeled fixture
-  (unused var, misnamed export, over-nesting, a style violation) so the lint metrics have a real,
-  non-blocking finding to report — same spirit as the duplication fixture below.
+  (unused var, misnamed export, over-nesting, a style violation, a deliberately high-complexity
+  function) so the lint metrics have a real, non-blocking finding to report — same spirit as the
+  duplication fixture below.
+- **Cyclomatic / Cognitive Complexity** — ESLint's built-in `complexity` rule and
+  `eslint-plugin-sonarjs`'s `sonarjs/cognitive-complexity` (both `npm run lint`, warn-only,
+  thresholds 8 and 15). `lib/lint-fixtures.ts`'s `highComplexityExample` trips both.
 - **Duplication** — `npm run dup` (jscpd, config loaded explicitly via `--config jscpd.json`).
   `items-service/` is excluded from this branch's scan (it has its own `npm run dup`); the
   intentional clone fixture (`items-service/src/db-clone.ts`) lives there now, alongside the file
   it's paired with.
 - **Tests** — `npm test` (mocha + ts-node) / `npm run test:coverage` (nyc,
   `nyc-mocha/coverage-summary.json`) / `npm run test:coverage:gate` (CI threshold gate)
+- **Coverage delta** — `npm run coverage:delta` (`scripts/coverage-delta.mjs`): compares the
+  current coverage run against the committed `coverage-baseline.json`, informational only.
+- **Code churn** — `npm run churn` (`scripts/code-churn.mjs`): aggregates real
+  `git log --numstat` per tracked file into `churn-report.json`, for risk-based test prioritization.
 - **Mutation testing** — `npm run mutation` (StrykerJS, nightly in CI — see
   `.github/workflows/mutation.yml`)
 - **CI** — `.github/workflows/ci.yml`, `codeql.yml`, `semgrep.yml`; `.github/dependabot.yml`
+- **Not tooled (accepted gaps)** — true Path Coverage (distinct from branch coverage) and
+  Data Flow "All-Defs/All-Uses" coverage have no maintained TypeScript tool; see
+  [COMPLIANCE.md](COMPLIANCE.md#test-classification-taxonomy-coverage) for why.
 
 ## Build status
 
