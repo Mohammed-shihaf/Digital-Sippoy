@@ -39,3 +39,4 @@ coverage/
 nyc-mocha/
 mutation-report.json
 reports/mutation/
+.stryker-tmp/

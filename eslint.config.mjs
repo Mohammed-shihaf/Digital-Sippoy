@@ -11,6 +11,8 @@ const config = [
       "lint-report.json",
       "jscpd-report/**",
       "next-env.d.ts",
+      ".stryker-tmp/**",
+      "reports/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
@@ -62,6 +64,14 @@ const config = [
           ],
         },
       ],
+    },
+  },
+  {
+    // Test files are naturally long describe() blocks; the complexity/
+    // length limits above exist for application logic, not suites.
+    files: ["test/**/*.{ts,tsx}"],
+    rules: {
+      "max-lines-per-function": "off",
     },
   },
 ];

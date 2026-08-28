@@ -15,7 +15,8 @@
     "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json",
     "dup": "jscpd .",
     "test": "mocha",
-    "test:coverage": "nyc npm test"
+    "test:coverage": "nyc npm test",
+    "mutation": "stryker run"
   },
   "dependencies": {
     "next": "15.5.12",
@@ -25,6 +26,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
+    "@stryker-mutator/core": "^8.6.0",
+    "@stryker-mutator/mocha-runner": "^8.6.0",
     "@types/mocha": "^10.0.9",
     "@types/node": "^20.14.0",
     "@types/react": "^19.1.0",

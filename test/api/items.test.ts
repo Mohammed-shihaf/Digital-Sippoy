@@ -42,18 +42,36 @@ describe("items API route (App Router)", () => {
     assert.equal(body.item.name, "Chair");
   });
 
-  it("POST with an empty name returns 400", async () => {
+  it("POST with an empty name returns 400 with the validation message", async () => {
     const res = await POST(jsonRequest({ name: "" }));
     assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.match(body.error, /non-empty string/);
   });
 
-  it("POST with a missing name field returns 400", async () => {
+  it("POST with a missing name field returns 400 with the validation message", async () => {
     const res = await POST(jsonRequest({}));
     assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.match(body.error, /non-empty string/);
   });
 
-  it("POST with malformed JSON returns 400", async () => {
+  it("POST with a null body returns 400 via the validation message, not a crash", async () => {
+    // Exercises the `(body as {...})?.name` optional chain. Without it,
+    // reading `.name` off a null body throws a TypeError that the same
+    // catch block also turns into a 400 -- so the status code alone can't
+    // tell them apart; the message can, since only the real validation
+    // path produces "non-empty string".
+    const res = await POST(jsonRequest(null));
+    assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.match(body.error, /non-empty string/);
+  });
+
+  it("POST with malformed JSON returns 400 with the parse-error message", async () => {
     const res = await POST(jsonRequest("not-json"));
     assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.equal(body.error, "Invalid JSON body");
   });
 });
