@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { GET, POST } from "../../app/api/items/route";
+import { ITEM_NAME_MAX_LENGTH } from "../../lib/validate";
 
 const DATA_FILE = path.join(process.cwd(), "data", "items.json");
 
@@ -66,6 +67,13 @@ describe("items API route (App Router)", () => {
     assert.equal(res.status, 400);
     const body = (await res.json()) as { error: string };
     assert.match(body.error, /non-empty string/);
+  });
+
+  it("POST with an over-long name returns 400 (a cap the old manual check lacked)", async () => {
+    const res = await POST(jsonRequest({ name: "x".repeat(ITEM_NAME_MAX_LENGTH + 1) }));
+    assert.equal(res.status, 400);
+    const body = (await res.json()) as { error: string };
+    assert.match(body.error, /200 characters or fewer/);
   });
 
   it("POST with malformed JSON returns 400 with the parse-error message", async () => {
