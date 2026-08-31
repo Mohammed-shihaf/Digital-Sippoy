@@ -1,0 +1,11 @@
+{
+  "branch": "DS-GAP-CF-3",
+  "domain": "Control Flow",
+  "omittedCount": 3,
+  "omittedMetrics": [
+    "WB-049 Test Case Granularity",
+    "WB-058 Branch Misdirection",
+    "WB-050 Unreachable Logic"
+  ],
+  "createdAt": "2026-08-31T10:16:54.344Z"
+}
