@@ -1,0 +1,10 @@
+{
+  "branch": "DS-GAP-SEC-2",
+  "domain": "Security SAST & SCA",
+  "omittedCount": 2,
+  "omittedMetrics": [
+    "WB-041 Dependency Health Monitoring",
+    "WB-039 License Compliance"
+  ],
+  "createdAt": "2026-08-31T10:16:43.721Z"
+}
