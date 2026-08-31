@@ -55,5 +55,7 @@ dependency-health-report.json
 license-compliance-report.json
 secret-scan-report.json
 cyclonedx-sbom.json
+audit-trail-report.json
+
 
 

@@ -13,6 +13,8 @@
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json",
+    "lint:gate": "eslint lib/db.ts lib/validate.ts lib/require-session.ts",
+    "audit:verify": "node scripts/verify-audit-log.mjs",
     "dup": "jscpd . --config jscpd.json",
     "test": "mocha",
     "test:coverage": "nyc npm test",

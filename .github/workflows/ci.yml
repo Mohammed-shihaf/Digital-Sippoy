@@ -22,6 +22,8 @@ jobs:
       - run: npm ci
       - run: npm run lint:report
         continue-on-error: true
+      - run: npm run lint:gate
+        continue-on-error: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -84,11 +86,15 @@ jobs:
       # Emit mocha-stats.json sidecar (Granularity, Correctness, Boundary Failure Rate)
       - run: node scripts/mocha-stats.mjs
         continue-on-error: true
+      - run: node scripts/verify-audit-log.mjs
+        continue-on-error: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mocha-stats
-          path: mocha-stats.json
+          path: |
+            mocha-stats.json
+            audit-trail-report.json
           retention-days: 14
       # Fresh Logic Proofing (patch coverage check)
       - name: Fresh logic proofing (patch coverage — informational)
