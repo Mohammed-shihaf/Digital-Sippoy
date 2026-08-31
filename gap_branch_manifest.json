@@ -1,11 +1,11 @@
 {
-  "branch": "DS-GAP-CF-3",
-  "domain": "Control Flow",
+  "branch": "DS-GAP-LINT-3",
+  "domain": "Lint & Static Analysis",
   "omittedCount": 3,
   "omittedMetrics": [
-    "WB-049 Test Case Granularity",
-    "WB-058 Branch Misdirection",
-    "WB-050 Unreachable Logic"
+    "WB-032 Automated Gatekeeping",
+    "WB-023 Unused Variables",
+    "WB-030 Custom FS Rule"
   ],
-  "createdAt": "2026-08-31T10:16:54.344Z"
+  "createdAt": "2026-08-31T10:17:14.835Z"
 }
