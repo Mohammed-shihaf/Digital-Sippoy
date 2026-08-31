@@ -1,11 +1,11 @@
 {
-  "branch": "DS-GAP-CF-3",
-  "domain": "Control Flow",
+  "branch": "DS-GAP-DUP-3",
+  "domain": "Code Duplication",
   "omittedCount": 3,
   "omittedMetrics": [
-    "WB-049 Test Case Granularity",
-    "WB-058 Branch Misdirection",
-    "WB-050 Unreachable Logic"
+    "WB-020 Test Suite Streamlining",
+    "WB-021 Token Synchronization",
+    "WB-017 Duplication Gate"
   ],
-  "createdAt": "2026-08-31T10:16:54.344Z"
+  "createdAt": "2026-08-31T10:17:05.110Z"
 }
