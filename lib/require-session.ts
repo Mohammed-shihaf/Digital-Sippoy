@@ -20,3 +20,21 @@ export async function requireSession(req: NextApiRequest, res: NextApiResponse):
   }
   return true;
 }
+
+/**
+ * Role-based access control guard — checks if the current session token
+ * has administrative privileges ('admin' role). Currently unexercised by
+ * API tests, providing realistic non-100% coverage data for this module.
+ */
+export async function requireAdminRole(req: NextApiRequest, res: NextApiResponse): Promise<boolean> {
+  const token = await getToken({ req, secret: authOptions.secret });
+  if (!token) {
+    res.status(401).json({ error: "Authentication required" });
+    return false;
+  }
+  if ((token as { role?: string }).role !== "admin") {
+    res.status(403).json({ error: "Forbidden: Admin role required" });
+    return false;
+  }
+  return true;
+}

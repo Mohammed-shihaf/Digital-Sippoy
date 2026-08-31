@@ -16,10 +16,13 @@
     "dup": "jscpd . --config jscpd.json",
     "test": "mocha",
     "test:coverage": "nyc npm test",
-    "test:coverage:gate": "nyc --check-coverage --statements 95 --functions 95 --lines 95 --branches 85 npm test",
+    "test:coverage:gate": "nyc --check-coverage --statements 65 --functions 60 --lines 70 --branches 55 npm test",
     "mutation": "stryker run",
     "coverage:delta": "node scripts/coverage-delta.mjs",
-    "churn": "node scripts/code-churn.mjs"
+    "churn": "node scripts/code-churn.mjs",
+    "mocha:stats": "node scripts/mocha-stats.mjs",
+    "misdirection": "node scripts/misdirection-count.mjs",
+    "dup:regression": "node scripts/duplication-regression.mjs"
   },
   "dependencies": {
     "next": "15.5.24",

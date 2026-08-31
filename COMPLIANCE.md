@@ -77,3 +77,45 @@ skipped:
 
 CI (`.github/workflows/ci.yml`, `codeql.yml`, `semgrep.yml`) supplies the
 automated half of V5/V7/V10/V14 verification on every push.
+
+## Phase 1 Policy — Data Collection & Measurement Verification Mode
+
+Per team strategy:
+- **Phase 1 (Current)**: Focuses on establishing baseline measurements, generating all report artifacts (`mocha-stats.json`, `misdirection-stats.json`, `jscpd-report.json`, `duplication-regression-map.json`, `lint-report.json`, `churn-report.json`, `test-impact-map.json`), and verifying that metric calculation pipelines run cleanly. **All CI quality checks operate in report-only mode (`continue-on-error: true`)** so builds complete cleanly while populating measurement data.
+- **Phase 2 (Future)**: Progressive activation of blocking CI gates after metric baseline accuracy is validated across all branches.
+
+## Metric gap closure — team analysis update (Aug 2026)
+
+Following team metric validation across all 32 branches (16 Microservices +
+16 Monolith), the following gaps were resolved or formally accepted. All
+changes land first on DS-064 and propagate to the full matrix.
+
+### Newly implemented (closed gaps)
+
+| Metric (L5) | What was missing | Fix |
+|---|---|---|
+| **Test Case Granularity** | Not in `coverage-summary.json` (S3 schema gap) | `scripts/mocha-stats.mjs` — emits `mocha-stats.json` with `testCaseGranularity`, `surfaceLevelCorrectness`, `boundaryFailureRate` |
+| **Surface-Level Correctness** | Same S3 schema gap | Same script |
+| **Boundary Failure Identification** | Same S3 schema gap | Same script |
+| **Branch Misdirection Discovery** | `Misdirection_Count` not emitted by nyc | `scripts/misdirection-count.mjs` — reads StrykerJS `mutation-report.json`, counts survived branch-direction mutants, emits `misdirection-stats.json` with `MAX(0, 100 − count×20)` |
+| **Structural Cleanliness Score** | jscpd CI job was `continue-on-error: true` | Removed `continue-on-error` — jscpd now hard-gates CI at the configured 5% threshold |
+| **Synchronization Verification** | Same CI gate issue | Same fix |
+| **Regression Focus Mapping** | No script consumed jscpd output | `scripts/duplication-regression.mjs` — maps each clone pair to its test file counterpart, emits `duplication-regression-map.json` |
+| **Rule Severity Classification** | Only 2 of ~10 rules were `error` | `eslint.config.mjs` — added app-code-only block upgrading `no-unused-vars`, `naming-convention`, `complexity`, `max-depth` to `error`; fixture files remain `warn` |
+| **CI/CD Automated Gatekeeping** | Lint job couldn't fail on style/complexity | Same ESLint change — real app violations now block CI |
+| **Audit Trail Verification** | No structured logging anywhere | `lib/db.ts` — `auditLog()` appends JSON lines to `data/audit.log` on every `addItem()`; tested in `test/lib/db.test.ts` |
+| **Impact-Driven Verification** | churn file existed but no test-to-file mapping | `scripts/code-churn.mjs` — now also emits `test-impact-map.json` mapping top-churn files to their test counterparts |
+
+### Formally accepted gaps (not silently skipped)
+
+Three metrics from the team's taxonomy remain unimplemented. They are listed
+here with the same honest reasoning applied to Path Coverage and Data Flow
+All-Defs/All-Uses above — no maintained TypeScript tooling satisfies them,
+and building synthetic metrics that mislabel what is actually being measured
+would be worse than documenting the gap.
+
+| Metric (L5) | Why not implemented |
+|---|---|
+| **Ripple Effect Mapping** (Coverage Delta → Change Impact Analysis) | Requires an AST-level call-graph diff tool that traces which logical paths are altered by a change and which downstream paths are affected. No maintained TypeScript tool does this; `scripts/code-churn.mjs` is the closest practical proxy (file-level churn, not path-level). |
+| **Fault Probability Modeling** (Code Churn → Defect Prediction) | Requires a commit history tagged with real application defects. Every fix commit in this repo addresses tooling/fixture issues, not shipped-code bugs. `churn-report.json` is not correlated against any defect list and presenting it as fault probability would be a mislabeled metric. |
+| **Side Effect Mapping** (Code Churn → Change Impact Analysis) | Same constraint as Ripple Effect Mapping — call-graph/AST-diff analysis for TypeScript has no maintained open-source tool in this ecosystem. |

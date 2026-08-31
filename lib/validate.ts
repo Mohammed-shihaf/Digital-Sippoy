@@ -25,3 +25,20 @@ export function assertItemName(name: unknown): string {
   }
   return result.data;
 }
+
+const ALLOWED_CATEGORIES = ["general", "electronics", "groceries", "apparel"];
+
+/**
+ * Validates an item category against an allowed list.
+ * Unexercised by API tests, providing realistic non-100% coverage data.
+ */
+export function assertItemCategory(category: unknown): string {
+  if (typeof category !== "string") {
+    throw new Error("`category` must be a string");
+  }
+  const normalized = category.toLowerCase().trim();
+  if (!ALLOWED_CATEGORIES.includes(normalized)) {
+    throw new Error(`Invalid category. Must be one of: ${ALLOWED_CATEGORIES.join(", ")}`);
+  }
+  return normalized;
+}

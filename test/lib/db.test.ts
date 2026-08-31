@@ -4,6 +4,8 @@ import path from "node:path";
 import { getItems, addItem } from "../../lib/db";
 import { DATA_FILE, captureDataFile, restoreDataFile } from "../helpers/data-file";
 
+const AUDIT_FILE = path.join(process.cwd(), "data", "audit.log");
+
 async function seedDataFile(
   items: { id: string; name: string; createdAt: string }[]
 ): Promise<void> {
@@ -89,6 +91,69 @@ describe("lib/db.ts", () => {
       await assert.rejects(() => getItems());
     } finally {
       await fs.rm(DATA_FILE, { force: true, recursive: true });
+    }
+  });
+});
+
+describe("lib/db.ts — audit log (Audit Trail Verification)", () => {
+  let originalData: string | null;
+  let originalAudit: string | null;
+
+  before(async () => {
+    originalData = await captureDataFile();
+    originalAudit = await fs.readFile(AUDIT_FILE, "utf-8").catch(() => null);
+  });
+
+  afterEach(async () => {
+    await restoreDataFile(originalData);
+    // Restore audit log: delete it if it didn't exist before, otherwise restore
+    if (originalAudit === null) {
+      await fs.rm(AUDIT_FILE, { force: true });
+    } else {
+      await fs.writeFile(AUDIT_FILE, originalAudit, "utf-8");
+    }
+  });
+
+  it("addItem() appends a structured JSON line to data/audit.log", async () => {
+    const item = await addItem("Audited Item");
+
+    const logContent = await fs.readFile(AUDIT_FILE, "utf-8");
+    const lines = logContent.trim().split("\n").filter(Boolean);
+    assert.ok(lines.length >= 1, "audit.log must contain at least one entry");
+
+    // Parse the last entry — it must be valid JSON
+    const lastEntry = JSON.parse(lines[lines.length - 1]) as Record<string, unknown>;
+    assert.equal(lastEntry.action, "item.created", "action field must be 'item.created'");
+    assert.equal(lastEntry.id, item.id, "audit entry must record the item id");
+    assert.equal(
+      lastEntry.nameLength,
+      item.name.length,
+      "audit entry records nameLength, not the name value (PII-safe)"
+    );
+    assert.ok(
+      typeof lastEntry.ts === "string" && lastEntry.ts.length > 0,
+      "audit entry must have a timestamp"
+    );
+  });
+
+  it("audit log entries are valid ISO 8601 timestamps", async () => {
+    await addItem("Timestamp Item");
+    const logContent = await fs.readFile(AUDIT_FILE, "utf-8");
+    const lines = logContent.trim().split("\n").filter(Boolean);
+    const entry = JSON.parse(lines[lines.length - 1]) as Record<string, unknown>;
+    const ts = new Date(entry.ts as string);
+    assert.ok(!isNaN(ts.getTime()), "ts must be a valid ISO 8601 date string");
+  });
+
+  it("multiple addItem() calls each produce one audit log entry", async () => {
+    await addItem("First");
+    await addItem("Second");
+    const logContent = await fs.readFile(AUDIT_FILE, "utf-8");
+    const lines = logContent.trim().split("\n").filter(Boolean);
+    assert.ok(lines.length >= 2, "two addItem calls must produce at least 2 audit entries");
+    // Both lines must parse as valid JSON
+    for (const line of lines) {
+      assert.doesNotThrow(() => JSON.parse(line), `Line must be valid JSON: ${line}`);
     }
   });
 });
