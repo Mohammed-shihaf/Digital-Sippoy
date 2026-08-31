@@ -56,6 +56,11 @@ license-compliance-report.json
 secret-scan-report.json
 cyclonedx-sbom.json
 audit-trail-report.json
+lizard-sonar-report.json
+data-flow-all-defs-report.json
+side-effect-mapping-report.json
+sast-sca-master-report.json
+
 
 
 
