@@ -46,3 +46,8 @@ export async function addItemCopy(name: string): Promise<Item> {
   await writeAllClone(items);
   return item;
 }
+
+export async function getItemsClone(): Promise<Item[]> {
+  return readAllClone();
+}
+
