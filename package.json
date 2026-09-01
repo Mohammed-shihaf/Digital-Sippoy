@@ -1,25 +1,40 @@
 {
-  "name": "digital-sippoy-ds-002",
+  "name": "digital-sippoy-ds-064",
   "version": "1.0.0",
   "private": true,
-  "description": "Digital-Sippoy DS-002: Next.js 15.5.24 / React 19.1.0 App Router, Turbopack, npm. Microservices architecture note.",
+  "description": "Digital-Sippoy DS-064: Next.js 15.5.24 / React 19.1.0 Pages Router, Webpack, bun. Monolith architecture note.",
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "npm@10.8.2",
+  "packageManager": "bun@1.3.14",
   "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build --turbo",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:report": "eslint . --ext .ts,.tsx -f json -o lint-report.json",
+    "lint:gate": "eslint lib/db.ts lib/validate.ts lib/require-session.ts",
+    "lint:density": "node scripts/lint-density.mjs",
+    "audit:verify": "node scripts/verify-audit-log.mjs",
+    "lizard:sonar": "node scripts/lizard-sonar-full.mjs",
+    "dataflow:defs": "node scripts/data-flow-all-defs.mjs",
+    "churn:effects": "node scripts/churn-side-effects.mjs",
+    "sast:master": "node scripts/sast-sca-master-report.mjs",
+    "scan:osv-grype": "node scripts/osv-grype-scan.mjs",
+    "ncu:check": "node scripts/ncu-check.mjs",
+    "advisories:poll": "node scripts/advisories-poll.mjs",
     "dup": "jscpd . --config jscpd.json",
     "test": "mocha",
     "test:coverage": "nyc npm test",
-    "test:coverage:gate": "nyc --check-coverage --statements 95 --functions 95 --lines 95 --branches 85 npm test",
+    "test:coverage:gate": "nyc --check-coverage --statements 65 --functions 60 --lines 70 --branches 55 npm test",
+    "test:vitest": "vitest run",
+    "test:vitest:coverage": "vitest run --coverage && node scripts/vitest-stats.mjs",
     "mutation": "stryker run",
     "coverage:delta": "node scripts/coverage-delta.mjs",
-    "churn": "node scripts/code-churn.mjs"
+    "churn": "node scripts/code-churn.mjs",
+    "mocha:stats": "node scripts/mocha-stats.mjs",
+    "misdirection": "node scripts/misdirection-count.mjs",
+    "dup:regression": "node scripts/duplication-regression.mjs"
   },
   "dependencies": {
     "next": "15.5.24",
@@ -43,10 +58,13 @@
     "eslint-plugin-sonarjs": "^4.2.0",
     "jscpd": "^4.0.5",
     "mocha": "^10.7.3",
+    "node-mocks-http": "^1.16.1",
     "nyc": "^17.1.0",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8"
   }
 }

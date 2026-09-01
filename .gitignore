@@ -55,5 +55,21 @@ dependency-health-report.json
 license-compliance-report.json
 secret-scan-report.json
 cyclonedx-sbom.json
+audit-trail-report.json
+lizard-sonar-report.json
+data-flow-all-defs-report.json
+side-effect-mapping-report.json
+sast-sca-master-report.json
+js_path_coverage.json
+fault-probability-report.json
+violation-density-report.json
+osv-grype-report.json
+ncu-report.json
+advisories-report.json
+vitest-coverage/
+
+
+
+
 
 
