@@ -62,6 +62,12 @@ side-effect-mapping-report.json
 sast-sca-master-report.json
 js_path_coverage.json
 fault-probability-report.json
+violation-density-report.json
+osv-grype-report.json
+ncu-report.json
+advisories-report.json
+vitest-coverage/
+
 
 
 

@@ -2,9 +2,9 @@ name: Semgrep
 
 on:
   push:
-    branches: [DS-064]
+    branches: ["**"]
   pull_request:
-    branches: [DS-064]
+    branches: ["**"]
 
 permissions:
   contents: read

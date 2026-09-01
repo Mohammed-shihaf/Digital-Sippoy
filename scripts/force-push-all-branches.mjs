@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 
-// Complete list of ALL 32 target branches
+// Complete list of ALL 41 target branches
 const ALL_TARGETS = [
   "DS-063", "DS-062", "DS-061", "DS-060", "DS-059", "DS-058", "DS-057", "DS-056",
   "DS-055", "DS-054", "DS-053", "DS-052", "DS-051", "DS-050", "DS-049", "DS-047",
@@ -9,22 +9,21 @@ const ALL_TARGETS = [
   "DS-014", "DS-012", "DS-011", "DS-010", "DS-008", "DS-006", "DS-005", "DS-004", "DS-002"
 ];
 
-function runCmd(cmd) {
+function runPush(branch) {
   try {
-    return execSync(cmd, { encoding: "utf-8", cwd: "d:\\Digital-Sippoy", stdio: "pipe" });
+    const out = execSync(`git push origin DS-064:${branch} --force 2>&1`, { encoding: "utf-8", cwd: "d:\\Digital-Sippoy" });
+    return true;
   } catch (err) {
-    return null;
+    return false;
   }
 }
 
-console.log("=== FORCE PUSHING DS-064 COMMIT (23d8f66) TO ALL 32 BRANCHES ON GITHUB ===\n");
-
-runCmd("git checkout -f DS-064");
+console.log("=== FORCE PUSHING DS-064 COMMIT (2bb58b0) TO ALL BRANCHES ON GITHUB ===\n");
 
 let count = 0;
 for (const branch of ALL_TARGETS) {
-  const res = runCmd(`git push --force origin DS-064:refs/heads/${branch}`);
-  if (res) {
+  const ok = runPush(branch);
+  if (ok) {
     count++;
     console.log(`  ✅ Pushed DS-064 -> ${branch} on GitHub`);
   } else {

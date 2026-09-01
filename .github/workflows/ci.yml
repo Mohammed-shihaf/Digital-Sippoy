@@ -24,11 +24,34 @@ jobs:
         continue-on-error: true
       - run: npm run lint:gate
         continue-on-error: true
+      - run: npm run lint:density
+        continue-on-error: true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lint-report
-          path: lint-report.json
+          path: |
+            lint-report.json
+            violation-density-report.json
+          retention-days: 14
+
+  vitest:
+    name: Vitest Coverage (TypeScript Tool Column)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run test:vitest:coverage
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-coverage
+          path: vitest-coverage/
           retention-days: 14
 
   duplication:
@@ -163,6 +186,12 @@ jobs:
         continue-on-error: true
       - run: node scripts/secret-scan.mjs
         continue-on-error: true
+      - run: npm run scan:osv-grype
+        continue-on-error: true
+      - run: npm run ncu:check
+        continue-on-error: true
+      - run: npm run advisories:poll
+        continue-on-error: true
       - run: node scripts/sast-sca-master-report.mjs
         continue-on-error: true
       - uses: actions/upload-artifact@v4
@@ -174,6 +203,9 @@ jobs:
             license-compliance-report.json
             dependency-health-report.json
             secret-scan-report.json
+            osv-grype-report.json
+            ncu-report.json
+            advisories-report.json
             sast-sca-master-report.json
           retention-days: 14
 
