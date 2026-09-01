@@ -144,7 +144,7 @@ jobs:
       - run: npm run build
 
   audit:
-    name: Dependency audit (report-only)
+    name: Security SAST & SCA audit (all 15 metrics)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -155,3 +155,25 @@ jobs:
       - run: npm ci
       - run: npm audit --production --audit-level=high
         continue-on-error: true
+      - run: node scripts/generate-sbom.mjs
+        continue-on-error: true
+      - run: node scripts/license-check.mjs
+        continue-on-error: true
+      - run: node scripts/dependency-health.mjs
+        continue-on-error: true
+      - run: node scripts/secret-scan.mjs
+        continue-on-error: true
+      - run: node scripts/sast-sca-master-report.mjs
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sast-sca-security-reports
+          path: |
+            cyclonedx-sbom.json
+            license-compliance-report.json
+            dependency-health-report.json
+            secret-scan-report.json
+            sast-sca-master-report.json
+          retention-days: 14
+
