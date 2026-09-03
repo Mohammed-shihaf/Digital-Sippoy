@@ -1,0 +1,13 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "include": ["lib/**/*.ts", "app/**/*.ts"],
+  "exclude": ["node_modules", ".next", "test", "**/*.d.ts"],
+  "reporter": ["text", "json", "lcov", "json-summary"],
+  "report-dir": "nyc-mocha",
+  "all": true,
+  "check-coverage": false,
+  "branches": 55,
+  "lines": 70,
+  "functions": 60,
+  "statements": 65
+}

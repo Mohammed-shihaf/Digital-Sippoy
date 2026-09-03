@@ -1,0 +1,14 @@
+{
+  "threshold": 1,
+  "minTokens": 50,
+  "reporters": ["json", "console"],
+  "output": "jscpd-report",
+  "ignore": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/vitest-coverage/**",
+    "**/nyc-mocha/**",
+    "**/*.json",
+    "**/*.md"
+  ]
+}

@@ -1,0 +1,150 @@
+name: CI — DigitalSippoy FE TypeScript (Node 20.x · npm)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (ESLint — report-only mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint:report
+        continue-on-error: true
+      - run: npm run lint:gate
+        continue-on-error: true
+      - run: npm run lint:density
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report
+          path: |
+            lint-report.json
+            violation-density-report.json
+          retention-days: 14
+
+  vitest:
+    name: Vitest Coverage (TypeScript — v8 provider)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run test:vitest:coverage
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-coverage
+          path: |
+            vitest-coverage/
+            vitest-stats.json
+          retention-days: 14
+
+  duplication:
+    name: Duplication (jscpd — report-only mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run dup
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jscpd-report
+          path: jscpd-report/
+          retention-days: 14
+
+  test:
+    name: Test + Coverage (nyc/mocha — data collection mode)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run test:coverage:gate
+        continue-on-error: true
+      - run: npm run coverage:delta
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nyc-mocha-coverage
+          path: nyc-mocha/
+          retention-days: 14
+
+  code-churn:
+    name: Code Churn (report-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run churn
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: churn-report
+          path: churn-report.json
+          retention-days: 14
+
+  mutation:
+    name: Mutation Testing (StrykerJS — nightly)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run mutation
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stryker-mutation-report
+          path: reports/mutation/
+          retention-days: 14
+
+  build:
+    name: Build (Next.js — Turbopack)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build
