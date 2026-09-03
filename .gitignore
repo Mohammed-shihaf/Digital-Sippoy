@@ -67,6 +67,11 @@ osv-grype-report.json
 ncu-report.json
 advisories-report.json
 vitest-coverage/
+env-var-audit-report.json
+todo-fixme-report.json
+file-size-report.json
+unused-exports-report.json
+json-schema-lint-report.json
 
 
 
