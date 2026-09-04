@@ -24,7 +24,8 @@
     "test:vitest:coverage": "vitest run --coverage && node scripts/vitest-stats.mjs",
     "mutation": "stryker run",
     "coverage:delta": "node scripts/coverage-delta.mjs",
-    "churn": "node scripts/code-churn.mjs"
+    "churn": "node scripts/code-churn.mjs",
+    "verify:shell": "bash --version"
   },
   "dependencies": {
     "next": "15.5.24",
