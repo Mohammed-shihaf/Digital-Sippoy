@@ -4,7 +4,8 @@
   "private": true,
   "description": "DigitalSippoy FE TypeScript: Next.js 15.5.24 / React 19.1.0 App Router, Turbopack, npm. Node.js 20.x. Analyzed from Digital-Sippoy DS-002 branch.",
   "engines": {
-    "node": "20.x"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "dev": "next dev --turbo",
