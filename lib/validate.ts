@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const ItemNameSchema = z
-  .string({ required_error: "`name` is required" })
+  .string({ required_error: "`name` is required", invalid_type_error: "`name` is required" })
   .trim()
   .min(1, "`name` must not be empty")
   .max(200, "`name` must be 200 characters or fewer");

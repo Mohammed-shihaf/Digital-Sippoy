@@ -8,11 +8,14 @@ export type Item = {
   createdAt: string;
 };
 
-const DATA_FILE = path.join(process.cwd(), "data", "items.json");
+function getDataFile(): string {
+  return path.join(process.cwd(), "data", "items.json");
+}
 
 async function readAll(): Promise<Item[]> {
+  const dataFile = getDataFile();
   try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8");
+    const raw = await fs.readFile(dataFile, "utf-8");
     return JSON.parse(raw) as Item[];
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
@@ -23,8 +26,9 @@ async function readAll(): Promise<Item[]> {
 }
 
 async function writeAll(items: Item[]): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(items, null, 2), "utf-8");
+  const dataFile = getDataFile();
+  await fs.mkdir(path.dirname(dataFile), { recursive: true });
+  await fs.writeFile(dataFile, JSON.stringify(items, null, 2), "utf-8");
 }
 
 export async function getItems(): Promise<Item[]> {
