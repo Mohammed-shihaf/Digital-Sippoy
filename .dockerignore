@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+coverage
+.nyc_output
+nyc-mocha
+jscpd-report
+reports
+.stryker-tmp
+*.log
